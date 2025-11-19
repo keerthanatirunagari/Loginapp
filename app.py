@@ -37,30 +37,36 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        name = request.form.get('name', '').strip()  
+        name = request.form.get('name')
+        username = request.form.get('username')
+        email = request.form.get('email')
         password = request.form.get('password')
-        if not name or not password:
-            return "Please provide name and password. <a href='/register'>Back</a>"
-        if User.query.filter_by(name=name).first():
-            return "User already exists! <a href='/register'>Back</a>"
-        user = User(name=name)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-        return f"User {name} registered. <a href='/login'>Login</a>"
-    return render_template('register.html')
 
-@app.route('/login', methods=['GET', 'POST'])
+        return f"Registered Successfully: {name}"
+
+    # If GET → show the register page
+    return render_template("register.html")
+
+
+
+# 3️⃣ LOGIN PAGE (GET)
+@app.route('/login', methods=['GET'])
+def login_page():
+    return render_template("login.html")
+
+# 4️⃣ LOGIN CHECK (POST)
+@app.route('/login', methods=['POST'])
 def login():
-    if request.method == 'POST':
-        name = request.form['name']
-        password = request.form['password']
-        user = User.query.filter_by(name=name).first()
-        if user and user.check_password(password):
-            return f"Welcome, {name}!"
-        else:
-            return "Invalid credentials."
-    return render_template('login.html')
+    username = request.form.get("username")
+    password = request.form.get("password")
+
+    user = User.query.filter_by(username=username).first()
+
+    if user and user.check_password(password):
+        return "Login Successful!"
+
+    return "Invalid username or password"
+
 
 if __name__ == '__main__':
     with app.app_context():
